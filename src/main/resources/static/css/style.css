@@ -1,0 +1,298 @@
+/* ================================
+   Global Color Variables
+================================ */
+:root {
+  --primary-green: #2BB300;   /* Eco Green */
+  --coolant-blue: #0077C2;    /* Tech Blue */
+  --accent-orange: #F97316;   /* CTA / Highlight */
+  --dark-grey: #2C2C2C;       /* Main text */
+  --white: #FFFFFF;           /* White */
+  --shadow-grey: #4B4B4B;     /* Shadow */
+  --light-grey: #F5F5F5;      /* Background */
+}
+
+/* ================================
+   Reset + Base Styles
+================================ */
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--white);
+  color: var(--dark-grey);
+  padding: 0;
+  padding-bottom: 2px; /* sticky footer space */
+  line-height: 1.6;
+}
+
+/* ================================
+   Header + Footer
+================================ */
+header, footer {
+  background: var(--dark-grey);
+  color: var(--white);
+  text-align: center;
+  padding: 1em;
+}
+header {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  z-index: 1003;
+  transition: top 0.3s ease;
+}
+footer {
+  position: relative;
+  bottom: 0; left: 0;
+  width: 100%;
+  font-size: 0.9em;
+  z-index: 999;
+}
+.hide-header { top: -100px; }
+
+/* Push content down */
+#main-content { flex: 1; padding-top: 80px; }
+
+/* ================================
+   Navigation
+================================ */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #0b0b0b;
+  color: white;
+  position: relative;
+  z-index: 1001;
+}
+.logo { font-size: 20px; font-weight: bold; }
+.nav-links { display: flex; gap: 1.5em; }
+.nav-links a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: bold;
+}
+.nav-links a:hover { color: var(--primary-green); }
+.hamburger { display: none; font-size: 26px; cursor: pointer; }
+
+/* Side Drawer (Mobile) */
+#side-drawer {
+  position: fixed;
+  top: 0; left: -250px;
+  width: 250px; height: 100%;
+  background: #111;
+  display: flex; flex-direction: column;
+  padding-top: 60px;
+  transition: left 0.3s ease;
+  z-index: 1002;
+}
+#side-drawer.active { left: 0; }
+#side-drawer a {
+  color: white;
+  padding: 15px 20px;
+  text-decoration: none;
+  border-bottom: 1px solid #333;
+}
+#side-drawer a:hover { background: #222; }
+#nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+#nav-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+  .hamburger { display: block; }
+  .nav-links { display: none; }
+}
+
+/* ================================
+   Sections
+================================ */
+section {/* padding: 2em; */text-align: center;}
+
+.home-gallery img {
+  width: 200px;
+  margin: 0.5em;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+.home-gallery img:hover { transform: scale(1.05); }
+
+@media (max-width: 600px) {
+  .home-gallery img { width: 100%; }
+  form input, form textarea { width: 90%; }
+}
+
+/* ================================
+   Forms
+================================ */
+form { max-width: 600px; margin: auto; }
+form input, form textarea {
+  width: 60%;
+  padding: 0.5em;
+  margin: 0.5em 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+form input:focus, form textarea:focus {
+  border-color: var(--coolant-blue);
+  outline: none;
+}
+form textarea { height: 100px; }
+form input[type="submit"] {
+  background: var(--coolant-blue);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  padding: 0.7em 1.5em;
+  border-radius: 5px;
+}
+form input[type="submit"]:hover { background: #005999; }
+
+/* ================================
+   Buttons
+================================ */
+.btn {
+  display: inline-block;
+  background: var(--primary-green);
+  color: var(--white);
+  padding: 0.7em 1.5em;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+.btn:hover { background: var(--coolant-blue); }
+
+/* Accent CTA button */
+.btn-accent {
+  background: var(--accent-orange);
+}
+.btn-accent:hover {
+  background: #C2410C;
+}
+
+/* ================================
+   Footer Extended
+================================ */
+.site-footer {
+  background: #111;
+  color: #ccc;
+  padding: 50px 20px 20px;
+  font-size: 14px;
+}
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: auto;
+}
+.footer-col h3, .footer-col h4 { color: #fff; margin-bottom: 15px; }
+.footer-col ul { list-style: none; padding: 0; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { color: #ccc; text-decoration: none; transition: color 0.3s; }
+.footer-col ul li a:hover { color: #fff; }
+.social-icons { margin-top: 15px; }
+.social-icons a {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 16px;
+  color: #ccc;
+  transition: color 0.3s;
+}
+.social-icons a:hover { color: #fff; }
+.footer-bottom {
+  border-top: 1px solid #333;
+  margin-top: 30px;
+  padding-top: 15px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}
+
+/* ================================
+   Feedback Floating Button + Modal
+================================ */
+#feedback-btn {
+  position: fixed;
+  right: 20px; bottom: 20px;
+  background: var(--accent-orange);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: background 0.3s;
+  z-index: 1000;
+}
+#feedback-btn i { margin-right: 8px; }
+#feedback-btn:hover { background: #C2410C; }
+
+.feedback-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+.feedback-modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 450px;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+}
+.feedback-modal-content h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.submit-btn {
+  background: var(--coolant-blue);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+.submit-btn:hover { background: #005999; }
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+#feedback-status {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+

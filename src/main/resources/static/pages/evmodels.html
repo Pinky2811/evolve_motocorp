@@ -1,0 +1,275 @@
+<section class="container py-5" data-aos="fade-up">
+  <h2 class="text-center mb-4" data-aos="zoom-in">EV Model Gallery</h2>
+
+  <!-- Filter & Sort Controls -->
+  <div class="row mb-4" data-aos="fade-up" data-aos-delay="100">
+    <div class="col-md-6 mb-2">
+      <label for="rangeFilter" class="form-label">Filter by Range</label>
+      <select id="rangeFilter" class="form-select">
+        <option value="">All Ranges</option>
+        <option value="below100">Below 100km</option>
+        <option value="100to150">100–150km</option>
+        <option value="above150">Above 150km</option>
+      </select>
+    </div>
+    <div class="col-md-6 mb-2">
+      <label for="sortPrice" class="form-label">Sort by Price</label>
+      <select id="sortPrice" class="form-select">
+        <option value="">Default</option>
+        <option value="asc">Low to High</option>
+        <option value="desc">High to Low</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-4">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search by model name or keyword...">
+  </div>
+
+  <!-- EV Model Cards -->
+  <div class="row" id="ev-model-list" data-aos="fade-up" data-aos-delay="200">
+    <p class="text-center text-muted">Loading models...</p>
+  </div>
+
+  <!-- Load More Button -->
+  <div class="text-center mt-4">
+    <button id="loadMoreBtn" class="btn btn-outline-primary px-4 rounded-pill d-none">
+      Load More
+    </button>
+  </div>
+</section>
+
+<!-- EV Model Details Modal -->
+<div class="modal fade" id="evDetailsModal" tabindex="-1" aria-labelledby="evDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-lg border-0">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold text-success" id="evDetailsModalLabel">EV Model Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body row g-4 align-items-center">
+        <div class="col-md-6 text-center">
+          <img id="modalImage" src="" alt="" class="img-fluid rounded-4 shadow-sm w-100">
+        </div>
+        <div class="col-md-6">
+          <h4 id="modalName" class="text-success fw-bold mb-2"></h4>
+          <table class="table table-borderless mb-3 small">
+            <tr>
+              <th class="text-muted">💰 Price:</th>
+              <td id="modalPrice" class="fw-semibold"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">🔋 Range:</th>
+              <td id="modalRange"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">⚡ Top Speed:</th>
+              <td id="modalSpeed"></td>
+            </tr>
+          </table>
+
+          <div>
+            <h6 class="fw-bold">✨ Features</h6>
+            <ul id="modalFeatures" class="list-unstyled small mb-3"></ul>
+          </div>
+
+          <div>
+            <h6 class="fw-bold">📝 Description / Quality</h6>
+            <p id="modalDescription" class="small text-muted"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Optional Styling -->
+<style>
+  /* === EV Model Card Image Fix === */
+#ev-model-list .card-img-top {
+  width: 100%;
+  height: 220px; /* You can adjust this height as you like (e.g. 200–260px) */
+  object-fit: contain; /* Show full image without cropping */
+  background-color: #f9f9f9; /* subtle neutral background for transparent or smaller images */
+  padding: 8px; /* adds space around image so edges aren't cut */
+  border-radius: 1rem 1rem 0 0;
+}
+
+/* Maintain sharpness on high-DPI screens */
+#ev-model-list img {
+  image-rendering: auto;
+}
+
+/* Optional: Smooth hover zoom for effect */
+#ev-model-list .card:hover img {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+#evDetailsModal img {
+  width: 100%;
+  max-height: 350px;
+  object-fit: contain;
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* #evDetailsModal img {
+  object-fit: cover;
+  max-height: 300px;
+} */
+#evDetailsModal th {
+  width: 40%;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+if (!window.evModelsLoaded) {
+  window.evModelsLoaded = true;
+
+  let allModels = [];
+  let filteredModels = [];
+  let currentPage = 1;
+  const modelsPerPage = 6;
+
+  window.loadEvModelsPage = function () {
+    const $list = $('#ev-model-list');
+
+    $.get("getAllModels", function (evModels) {
+      allModels = evModels;
+      filteredModels = [...allModels];
+      renderModels(getPageModels(filteredModels, currentPage), true);
+      toggleLoadMoreButton();
+    });
+
+    $('#rangeFilter').off('change').on('change', function () {
+      applyFilters(true);
+    });
+
+    $('#sortPrice').off('change').on('change', function () {
+      applyFilters(true);
+    });
+
+    $('#loadMoreBtn').off('click').on('click', function () {
+      currentPage++;
+      renderModels(getPageModels(filteredModels, currentPage), false);
+      toggleLoadMoreButton();
+    });
+
+    $('#searchInput').off('input').on('input', applyFilters);
+  };
+
+  function renderModels(models, reset = false) {
+    const $list = $('#ev-model-list');
+    if (reset) $list.empty();
+
+    if (currentPage === 1 && models.length === 0) {
+      $list.html(`
+        <div class="text-center text-muted">
+          <p>No models match your filter.</p>
+          <button class="btn btn-outline-secondary mt-3" id="suggestModelBtn">Suggest a Model</button>
+        </div>
+      `);
+      $('#loadMoreBtn').addClass('d-none');
+      $('#suggestModelBtn').off('click').on('click', function () {
+        alert("Thank you for your interest! We'll soon let you suggest a model.");
+      });
+      return;
+    }
+
+    models.forEach((model, index) => {
+      const globalIndex = (currentPage - 1) * modelsPerPage + index;
+      const featuresHTML = model.features.map(f => `<li>✅ ${f}</li>`).join("");
+
+      // ✅ Display card with key specs
+      $list.append(`
+        <div class="col-md-6 col-lg-4 mb-4 d-flex" data-aos="fade-up" data-aos-delay="${index * 100}">
+          <div class="card h-100 shadow-sm rounded-4 flex-fill">
+            <img src="${model.imagePath}" class="card-img-top rounded-top-4" alt="${model.modelName}">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-success">${model.modelName}</h5>
+              <p class="text-muted small mb-1"><strong>Price:</strong> ₹${model.price}</p>
+              <p class="text-muted small mb-1"><strong>Range:</strong> ${model.rangeKm} km</p>
+              <p class="text-muted small mb-1"><strong>Top Speed:</strong> ${model.topSpeed} km/h</p>
+              <ul class="list-unstyled small mb-3">${featuresHTML}</ul>
+              <button class="btn btn-outline-primary mt-auto view-details-btn" data-index="${globalIndex}">View Details</button>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+
+    $('.view-details-btn').off('click').on('click', function () {
+      const index = $(this).data('index');
+      const model = filteredModels[index];
+      showDetailsModal(model);
+    });
+  }
+
+  function getPageModels(models, page) {
+    const start = (page - 1) * modelsPerPage;
+    return models.slice(start, start + modelsPerPage);
+  }
+
+  function toggleLoadMoreButton() {
+    const shownCount = currentPage * modelsPerPage;
+    const $btn = $('#loadMoreBtn');
+    if (shownCount >= filteredModels.length) {
+      $btn.addClass('d-none');
+    } else {
+      $btn.removeClass('d-none');
+    }
+  }
+
+  // ✅ Show Details Modal
+  function showDetailsModal(model) {
+    $('#modalImage').attr('src', model.imagePath || 'images/default-ev.jpg');
+    $('#modalName').text(model.modelName || 'N/A');
+    $('#modalPrice').text(`₹${model.price || 'N/A'}`);
+    $('#modalRange').text(model.rangeKm ? `${model.rangeKm} km` : 'N/A');
+    $('#modalSpeed').text(model.topSpeed ? `${model.topSpeed} km/h` : 'N/A');
+    $('#modalFeatures').html(model.features && model.features.length
+      ? model.features.map(f => `<li>✅ ${f}</li>`).join("")
+      : '<li class="text-muted">No features listed</li>');
+    $('#modalDescription').text(model.description || 'No description available.');
+    const modal = new bootstrap.Modal(document.getElementById('evDetailsModal'));
+    modal.show();
+  }
+
+  function applyFilters() {
+    const range = $('#rangeFilter').val();
+    const sort = $('#sortPrice').val();
+    const search = $('#searchInput').val().toLowerCase().trim();
+    let filtered = [...allModels];
+
+    if (range) {
+      filtered = filtered.filter(model => {
+        const km = model.rangeKm || 0;
+        if (range === "below100") return km < 100;
+        if (range === "100to150") return km >= 100 && km <= 150;
+        if (range === "above150") return km > 150;
+      });
+    }
+
+    if (search) {
+      filtered = filtered.filter(model =>
+        model.modelName.toLowerCase().includes(search) ||
+        model.features.some(f => f.toLowerCase().includes(search))
+      );
+    }
+
+    if (sort === "asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sort === "desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+
+    currentPage = 1;
+    filteredModels = filtered;
+    renderModels(getPageModels(filtered, currentPage), true);
+    toggleLoadMoreButton();
+  }
+}
+</script>

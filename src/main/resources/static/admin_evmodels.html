@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Manage EV Models</title>
+  <!-- Required Styles -->
+<link rel="stylesheet" href="Offline/css/bootstrap.min.css">
+<link rel="stylesheet" href="Offline/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="Offline/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" href="Offline/css/all.min.css" />
+  <style>
+    body { background: #f8f9fa; }
+    .card { box-shadow: 0 6px 18px rgba(0,0,0,0.06); border-radius: 10px; }
+    .top-bar { margin-top: 20px; margin-bottom: 20px; }
+    #loader p { color: #555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Bar -->
+    <div class="top-bar d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">Admin — Manage EV Models</h2>
+      <div>
+        <button class="btn btn-outline-secondary me-2" id="backToAdminBtn">
+          ← Back to Dashboard
+        </button>
+        <button class="btn btn-danger" id="logoutBtn">
+          Logout
+        </button>
+      </div>
+    </div>
+    <!-- Add / Edit Form -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <form id="addEvModelForm" enctype="multipart/form-data" class="row g-3 needs-validation" novalidate>
+          <input type="hidden" id="modelId" />
+          <div class="col-md-6">
+            <label for="modelName" class="form-label">Model Name</label>
+            <input type="text" class="form-control" id="modelName" required />
+            <div class="invalid-feedback">Please enter model name.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="company" class="form-label">Company</label>
+            <input type="text" class="form-control" id="company" required />
+            <div class="invalid-feedback">Please enter company name.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="price" class="form-label">Price (₹)</label>
+            <input type="number" class="form-control" id="price" required />
+          </div>
+          <div class="col-md-4">
+            <label for="rangeKm" class="form-label">Range (km)</label>
+            <input type="number" class="form-control" id="rangeKm" required />
+          </div>
+          <div class="col-md-4">
+            <label for="topSpeed" class="form-label">Top Speed (km/h)</label>
+            <input type="number" class="form-control" id="topSpeed" required />
+          </div>
+          <div class="col-12">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" rows="3" required></textarea>
+          </div>
+          <div class="col-md-6">
+            <label for="features" class="form-label">Features (comma-separated)</label>
+            <input type="text" class="form-control" id="features" placeholder="Fast charging, Bluetooth, etc." />
+          </div>
+          <div class="col-md-6">
+            <label for="image" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="image" accept="image/*" />
+            <div class="mt-2">
+              <img id="imagePreview" src="" alt="Preview" class="img-thumbnail d-none" width="150" />
+            </div>
+          </div>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success px-5" id="submitBtn">Add Model</button>
+            <button type="button" class="btn btn-secondary px-4 d-none" id="cancelEditBtn">Cancel Edit</button>
+          </div>
+        </form>
+        <!-- Loader -->
+        <div id="loader" class="text-center mt-3 d-none">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2">Processing, please wait...</p>
+        </div>
+        <!-- Toast -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+          <div id="toastMsg" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body"></div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Table -->
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="evModelTable" class="table table-bordered table-striped table-hover w-100">
+            <thead class="table-dark text-center">
+              <tr>
+                <th>Image</th>
+                <th>Model Name</th>
+                <th>Company</th>
+                <th>Price</th>
+                <th>Range</th>
+                <th>Top Speed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="evModelBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4 text-muted small">Admin EV Models Panel</div>
+  </div>
+  <!-- Scripts -->
+  <script src="Offline/js/jquery.min.js"></script>
+<script src="Offline/js/bootstrap.bundle.min.js"></script>
+<script src="Offline/js/jquery.dataTables.min.js"></script>
+<script src="Offline/js/dataTables.bootstrap5.min.js"></script>
+<script src="Offline/js/dataTables.buttons.min.js"></script>
+<script src="Offline/js/buttons.bootstrap5.min.js"></script>
+  <script src="Offline/js/jszip.min.js"></script>
+<script src="Offline/js/pdfmake.min.js"></script>
+<script src="Offline/js/vfs_fonts.js"></script>
+<script src="Offline/js/buttons.html5.min.js"></script>
+<script src="Offline/js/buttons.print.min.js"></script>
+  <script>
+    // Configuration
+    var loginRedirect = "/Evolve_Ev/index.html#admin";
+
+    $(document).ready(function () {
+      // Session Check
+      if (sessionStorage.getItem("isAdminLoggedIn") !== "true") {
+        window.location.href = loginRedirect;
+        return;
+      }
+
+      // Load models immediately
+      loadEvModels();
+
+      // Back to Dashboard
+      $("#backToAdminBtn").click(function () {
+        window.location.href = loginRedirect;
+      });
+
+      // Logout
+      $("#logoutBtn").click(function () {
+        if (confirm("Logout and return to login?")) {
+          sessionStorage.removeItem("isAdminLoggedIn");
+          $.post("logout", function () {
+            window.location.href = loginRedirect;
+          });
+        }
+      });
+
+      // Image Preview
+      $("#image").on("change", function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = e => $("#imagePreview").attr("src", e.target.result).removeClass("d-none");
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Add / Edit Model
+      $("#addEvModelForm").on("submit", function (e) {
+  e.preventDefault();
+  if (!this.checkValidity()) {
+    e.stopPropagation();
+    $(this).addClass("was-validated");
+    return;
+  }
+
+  const isEdit = $("#modelId").val() !== "";
+  const apiUrl = isEdit ? "updateModel" : "addModel";
+  $("#loader").removeClass("d-none");
+
+  const formData = new FormData();
+  if (isEdit) formData.append("id", $("#modelId").val());
+  formData.append("modelName", $("#modelName").val());
+  formData.append("company", $("#company").val());
+  formData.append("price", $("#price").val());
+formData.append("rangeKm", $("#rangeKm").val());  // ✅ fixed key name
+  formData.append("topSpeed", $("#topSpeed").val());
+  formData.append("description", $("#description").val());
+  formData.append("features", $("#features").val());
+
+  // ✅ Correct single image field
+  if ($("#image")[0].files.length > 0) {
+    formData.append("image", $("#image")[0].files[0]);
+  }
+
+  $.ajax({
+    url: apiUrl,
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function () {
+      $("#loader").addClass("d-none");
+      showToast(isEdit ? "Model updated successfully!" : "Model added successfully!");
+      resetForm();
+      loadEvModels();
+    },
+    error: function () {
+      $("#loader").addClass("d-none");
+      showToast("Error saving model!", true);
+    }
+  });
+});
+
+      // Load Models
+      function loadEvModels() {
+        $.get("getAllModels")
+          .done(function (models) {
+            let rows = "";
+            models.forEach(m => {
+              rows += `
+                <tr>
+                  <td class="text-center"><img src="${m.imagePath || '/images/no-image.png'}" width="80" class="rounded" /></td>
+                  <td>${escapeHtml(m.modelName)}</td>
+                  <td>${escapeHtml(m.company)}</td>
+                  <td>₹${m.price}</td>
+                  <td>${m.rangeKm} km</td>
+                  <td>${m.topSpeed} km/h</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-warning me-1" onclick="editModel(${m.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteModel(${m.id})"><i class="fas fa-trash"></i></button>
+                  </td>
+                </tr>`;
+            });
+            if ($.fn.DataTable.isDataTable("#evModelTable")) {
+              $("#evModelTable").DataTable().clear().destroy();
+            }
+            $("#evModelBody").html(rows);
+            $("#evModelTable").DataTable({
+              dom: "Bfrtip",
+              buttons: ["copy", "csv", "excel", "pdf", "print"],
+              pageLength: 8
+            });
+          })
+          .fail(() => showToast("Failed to load models", true));
+      }
+
+      // Edit Model
+      window.editModel = function (id) {
+        $.get(`getModel/${id}`)
+          .done(function (m) {
+            $("#modelId").val(m.id);
+            $("#modelName").val(m.modelName);
+            $("#company").val(m.company);
+            $("#price").val(m.price);
+            $("#rangeKm").val(m.rangeKm);
+            $("#topSpeed").val(m.topSpeed);
+            $("#description").val(m.description);
+            $("#features").val(m.features ? m.features.join(", ") : "");
+            $("#imagePreview").attr("src", m.imagePath).removeClass("d-none");
+            $("#submitBtn").text("Update Model").removeClass("btn-success").addClass("btn-primary");
+            $("#cancelEditBtn").removeClass("d-none");
+            $("html, body").animate({ scrollTop: $("#addEvModelForm").offset().top - 100 }, 400);
+          })
+          .fail(() => showToast("Failed to load model", true));
+      };
+
+      // Delete Model
+      window.deleteModel = function (id) {
+        if (!confirm("Are you sure you want to delete this model?")) return;
+        $.ajax({
+          url: `deleteModel/${id}`,
+          type: "DELETE",
+          success: function () {
+            showToast("Model deleted successfully!");
+            loadEvModels();
+          },
+          error: function () {
+            showToast("Error deleting model!", true);
+          }
+        });
+      };
+
+      // Reset Form
+      $("#cancelEditBtn").click(resetForm);
+      function resetForm() {
+        $("#addEvModelForm")[0].reset();
+        $("#modelId").val("");
+        $("#imagePreview").addClass("d-none");
+        $("#submitBtn").text("Add Model").removeClass("btn-primary").addClass("btn-success");
+        $("#cancelEditBtn").addClass("d-none");
+        $("#addEvModelForm").removeClass("was-validated");
+      }
+
+      // Toast Helper
+      function showToast(msg, isError = false) {
+        const toast = $("#toastMsg");
+        toast.removeClass("text-bg-success text-bg-danger").addClass(isError ? "text-bg-danger" : "text-bg-success");
+        toast.find(".toast-body").text(msg);
+        new bootstrap.Toast(toast[0]).show();
+      }
+
+      // Escape HTML (safe output)
+      function escapeHtml(text) {
+        if (!text) return "";
+        return text
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+.policy-section {
+  background: #fff; /* White background */
+  padding: 40px 20px;
+}
+
+.policy-section .container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.policy-card {
+  background: none; /* remove card background */
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  line-height: 1.8;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #333;
+}
+
+.policy-card h1 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 700;
+  color: #f25c05; /* orange like Komaki */
+}
+
+.policy-card h2 {
+  font-size: 22px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: #111;
+  text-align: left; /* left aligned */
+  font-weight: 600;
+}
+
+.policy-card p {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #555;
+  text-align: left;
+}

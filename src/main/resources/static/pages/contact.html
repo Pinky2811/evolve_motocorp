@@ -1,0 +1,70 @@
+  <link rel="stylesheet" href="css/HomeStyle.css" />
+
+<!-- ✅ Hero Banner Section -->
+  <section>
+  <!-- ✅ Right Side: Get in Touch Form -->
+  <div class="contact-form-card">
+    <h2>Get in Touch with Us</h2>
+    <form id="leadForm">
+      <input type="text" id="name" name="name" placeholder="Your Name" required />
+      <input type="tel" id="phone" name="phone" placeholder="Phone Number" pattern="[0-9]{10}" required />
+      <input type="email" id="email" name="email" placeholder="Email Address" required />
+      <input type="text" id="pincode" name="pincode" placeholder="Pincode" pattern="[0-9]{6}" required />
+      <textarea id="message" name="message" placeholder="What would you like to say?" required></textarea>
+      <button type="submit" class="btn-success">I am Interested</button>
+    </form>
+  </div>
+</section>
+
+  <!-- ✅ Script for Lead Form Submission -->
+  <script src="Offline/js/jquery.min.js"></script>
+<script>
+  // flag to detect a WhatsApp attempt
+  window.__waAttempt = false;
+
+  // When user returns to the page, show thank you once
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && window.__waAttempt) {
+      alert("✅ Thanks! If you sent the WhatsApp, our team will contact you shortly.");
+      const form = document.getElementById('leadForm');
+      if (form) form.reset();
+      window.__waAttempt = false; // prevent duplicate alerts
+    }
+  });
+
+  $(function () {
+    $("#leadForm").on("submit", function (e) {
+  e.preventDefault();
+
+  const name    = $("#name").val().trim();
+  const phone   = $("#phone").val().trim();
+  const email   = $("#email").val().trim();
+  const pincode = $("#pincode").val().trim();
+  const message = $("#message").val().trim();
+
+  if (!/^\d{10}$/.test(phone)) { alert("Please enter a valid 10-digit phone."); return; }
+  if (!/^\d{6}$/.test(pincode)) { alert("Please enter a valid 6-digit pincode."); return; }
+
+  const adminNumber = "919327274109"; // India code + number
+  const text = 
+`Hello Evolve Motocorp Team 👋,
+I’m interested in your electric vehicles and would like to know more details.
+
+Here are my details:
+👤 Name: ${name}
+📞 Phone: ${phone}
+📧 Email: ${email}
+📍 Pincode: ${pincode}
+💬 Message: ${message}
+
+Looking forward to your response! ⚡`;
+
+  const waUrl = `https://api.whatsapp.com/send?phone=${adminNumber}&text=${encodeURIComponent(text)}&app_absent=0`;
+
+  window.__waAttempt = true;
+  window.open(waUrl, "_blank");
+});
+
+  });
+</script>
+

@@ -1,0 +1,158 @@
+<section id="brochure-gallery" class="brochure-section">
+  <h2>EVOLVE MOTOCORP GALLERY</h2>
+  <p class="subtitle">Discover our latest electric vehicle range, innovation, and vision through our 2025 brochure.</p>
+
+  <div class="brochure-container">
+    <!-- Brochure Page 1 -->
+    <div class="brochure-card">
+      <img src="images/ev_models/evolve2.png" alt="Brochure Page 1" />
+      <div class="brochure-info">
+        <h3>Our Vision 2025</h3>
+        <p>EVOLVE MOTOCORP is redefining electric mobility through design, performance, and sustainability.</p>
+      </div>
+    </div>
+
+    <!-- Brochure Page 2 -->
+    <div class="brochure-card">
+      <img src="images/ev_models/evolve3.png" alt="Brochure Page 2" />
+      <div class="brochure-info">
+        <h3>EV Line-up</h3>
+        <p>Explore our advanced electric scooters and bikes engineered for efficiency and style.</p>
+      </div>
+    </div>
+
+    <!-- Brochure Page 3 -->
+    <div class="brochure-card">
+      <img src="images/ev_models/evolve5.png" alt="Brochure Page 3" />
+      <div class="brochure-info">
+        <h3>Smart Technology</h3>
+        <p>Intelligent battery management, app integration, and real-time diagnostics for effortless rides.</p>
+      </div>
+    </div>
+
+    <!-- Brochure Page 4 -->
+    <div class="brochure-card">
+      <img src="images/ev_models/evolve12.png" alt="Brochure Page 4" />
+      <div class="brochure-info">
+        <h3>Charging Network</h3>
+        <p>Our rapidly expanding fast-charging network keeps your EV ready to move anytime, anywhere.</p>
+      </div>
+    </div>
+
+    <!-- Brochure Page 5 -->
+    <div class="brochure-card">
+      <img src="images/ev_models/evolve7.png" alt="Brochure Page 5" />
+      <div class="brochure-info">
+        <h3>Join the EV Revolution</h3>
+        <p>Become part of India’s sustainable mobility movement with EVOLVE MOTOCORP.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="download-section">
+    <a href="pdf/BROUCHERS.pdf" target="_blank" class="download-btn">
+      📘 Download Full Brochure (PDF)
+    </a>
+  </div>
+</section>
+
+<style>
+  /* ===== Brochure Section ===== */
+  .brochure-section {
+    padding: 70px 5%;
+    text-align: center;
+    background: #f9f9f9;
+  }
+
+  .brochure-section h2 {
+    font-size: 2.2rem;
+    color: #111;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .brochure-section .subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 35px;
+  }
+
+  /* ===== Gallery Grid ===== */
+  .brochure-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+  }
+
+  .brochure-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.35s ease;
+    cursor: pointer;
+  }
+
+  .brochure-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  .brochure-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+  }
+
+  .brochure-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .brochure-info {
+    padding: 18px;
+  }
+
+  .brochure-info h3 {
+    font-size: 1.1rem;
+    color: #111;
+    margin-bottom: 6px;
+  }
+
+  .brochure-info p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  /* ===== Download Button ===== */
+  .download-section {
+    margin-top: 50px;
+  }
+
+  .download-btn {
+    display: inline-block;
+    background-color: #00c9a7;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .download-btn:hover {
+    background-color: #009e86;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .brochure-section {
+      padding: 50px 20px;
+    }
+    .brochure-card img {
+      height: 200px;
+    }
+  }
+</style>

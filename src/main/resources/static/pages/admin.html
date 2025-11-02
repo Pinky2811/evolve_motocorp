@@ -1,0 +1,141 @@
+<!-- ✅ Required Styles and Scripts for Bootstrap + DataTables -->
+<link rel="stylesheet" href="Offline/css/bootstrap.min.css">
+<link rel="stylesheet" href="Offline/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="Offline/css/buttons.bootstrap5.min.css">
+  <script src="Offline/js/jquery.min.js"></script>
+<script src="Offline/js/bootstrap.bundle.min.js"></script>
+<script src="Offline/js/jquery.dataTables.min.js"></script>
+<script src="Offline/js/dataTables.bootstrap5.min.js"></script>
+<script src="Offline/js/dataTables.buttons.min.js"></script>
+<script src="Offline/js/buttons.bootstrap5.min.js"></script>
+<script src="Offline/js/jszip.min.js"></script>
+<script src="Offline/js/pdfmake.min.js"></script>
+<script src="Offline/js/vfs_fonts.js"></script>
+<script src="Offline/js/buttons.html5.min.js"></script>
+<script src="Offline/js/buttons.print.min.js"></script>
+
+<!-- ✅ Admin Section -->
+<section class="admin-section container mt-5">
+  <h2 class="mb-4">Admin Panel</h2>
+
+  <!-- ✅ Login Section -->
+  <div id="login-section">
+    <form id="admin-login-form" class="needs-validation" novalidate>
+      <div class="mb-3">
+        <label for="username" class="form-label">Admin Username</label>
+        <input type="text" class="form-control" id="username" name="username" required>
+        <div class="invalid-feedback">Please enter your username.</div>
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" required>
+          <span class="input-group-text" id="toggle-password" style="cursor: pointer;" onclick="togglePasswordVisibility()">
+            <i class="fas fa-eye" id="eye-icon"></i>
+          </span>
+        </div>
+        <div class="invalid-feedback">Please enter your password.</div>
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100" style="margin-bottom: 25px;">Login</button>
+    </form>
+  </div>
+
+  <!-- ✅ Admin Panel (Hidden by Default) -->
+  <section id="admin-data" class="admin-panel d-none py-5">
+    <div class="container-fluid">
+
+      <!-- 🪄 Admin Quick Access Button -->
+      <div class="text-center mb-4">
+        <button id="manage-evmodels-btn" class="btn btn-success">
+          <i class="fas fa-car me-2"></i>Manage EV Models
+        </button>
+      </div>
+
+      <!-- 🔴 Logout Button -->
+      <div class="d-flex justify-content-center mb-3">
+        <button class="btn btn-danger" id="logout-btn">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </button>
+      </div>
+
+      <!-- 📊 Prebooking Table -->
+      <div class="table-responsive">
+        <table id="adminTable" class="table table-bordered table-striped table-hover w-100">
+          <thead class="table-dark text-center">
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Contact No</th>
+              <th>Receipt No</th>
+              <th>Coupon No</th>
+              <th>Booked On</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body">
+            <!-- Filled after login -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ✅ Bulk Voucher Section -->
+<section id="bulk-voucher-section" class="container mt-5 d-none">
+  <h3 class="mb-3">Bulk Generate Vouchers</h3>
+  <form id="voucherForm" class="row g-3">
+    <div class="col-md-6">
+      <label for="receiptStart" class="form-label">Start Receipt No.</label>
+      <input type="text" class="form-control" id="receiptStart" placeholder="EV202550" required />
+    </div>
+    <div class="col-md-6">
+      <label for="receiptEnd" class="form-label">End Receipt No.</label>
+      <input type="text" class="form-control" id="receiptEnd" readonly />
+    </div>
+    <div class="col-md-6">
+      <label for="couponStart" class="form-label">Start Coupon No.</label>
+      <input type="text" class="form-control" id="couponStart" placeholder="CPN202550" required />
+    </div>
+    <div class="col-md-6">
+      <label for="couponEnd" class="form-label">End Coupon No.</label>
+      <input type="text" class="form-control" id="couponEnd" readonly />
+    </div>
+    <div class="col-md-6">
+      <label for="rangeCount" class="form-label">Range Count</label>
+      <input type="number" class="form-control" id="rangeCount" placeholder="100" min="1" required />
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Generate Vouchers</button>
+    </div>
+  </form>
+  <div id="voucherStatus" class="mt-3"></div>
+</section>
+
+<!-- ✅ Unused Voucher Section -->
+<section id="unused-voucher-section" class="container mt-5 d-none">
+  <h3 class="mb-3">Delete Unused Vouchers</h3>
+  <button class="btn btn-warning mb-3" id="load-unused-btn">Show Unused Vouchers</button>
+
+  <form id="deleteVoucherForm" class="d-none">
+    <div class="table-responsive">
+      <table id="unusedVoucherTable" class="table table-bordered table-striped w-100">
+        <thead class="table-dark text-center">
+          <tr>
+            <th><input type="checkbox" id="select-all" /> Select All</th>
+            <th>Receipt No</th>
+            <th>Coupon No</th>
+            <th>Date Assigned</th>
+          </tr>
+        </thead>
+        <tbody id="unusedVoucherBody"></tbody>
+      </table>
+    </div>
+    <button type="submit" class="btn btn-danger mt-3">Delete Selected</button>
+  </form>
+</section>
+
+<script src="js/admin.js"></script>
+

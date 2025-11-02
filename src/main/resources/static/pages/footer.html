@@ -1,0 +1,354 @@
+<!-- WhatsApp Chat + Phone Call Buttons -->
+<style>
+  /* ===== Floating Buttons ===== */
+  .floating-buttons {
+    position: fixed;
+    right: 20px;
+    bottom: 90px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .floating-buttons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .floating-buttons a.whatsapp-btn {
+    background-color: #25D366;
+  }
+
+  .floating-buttons a.call-btn {
+    background-color: #34B7F1;
+  }
+
+  .floating-buttons a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+ /* Match hover effect with Quick Links */
+  .footer-col a.contact-link {
+    color: #bbb;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-col a.contact-link:hover {
+    color: #00c9a7; /* Same as your hover highlight color */
+  }
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .floating-buttons {
+      right: 15px;
+      bottom: 80px;
+      gap: 10px;
+    }
+    .floating-buttons a {
+      width: 50px;
+      height: 50px;
+      font-size: 22px;
+    }
+  }
+
+  /* ===== Footer Styling ===== */
+  .site-footer {
+    background-color: #111;
+    color: #eee;
+    padding: 60px 5% 20px;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 40px;
+  }
+
+  .footer-col h3,
+  .footer-col h4 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .footer-col p {
+    color: #ccc;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-col ul li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col ul li a {
+    color: #bbb;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-col ul li a:hover {
+    color: #00c9a7;
+  }
+
+  /* ===== Social Icons ===== */
+  .social-icons {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .social-icons a {
+    color: #fff;
+    font-size: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .social-icons a:hover {
+    transform: scale(1.1);
+  }
+
+  /* Hover colors */
+  .social-icons a:hover i.fa-facebook-f {
+    color: #1877f2;
+  }
+  .social-icons a:hover i.fa-twitter {
+    color: #1da1f2;
+  }
+  .social-icons a:hover i.fa-linkedin-in {
+    color: #0077b5;
+  }
+  .social-icons a:hover i.fa-instagram {
+    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* ===== Footer Bottom ===== */
+  .footer-bottom {
+    text-align: center;
+    padding-top: 25px;
+    border-top: 1px solid #333;
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-top: 40px;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .footer-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .social-icons {
+      justify-content: center;
+    }
+  }
+
+  /* ===== Feedback Modal (Optional Future Feature) ===== */
+  .feedback-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .feedback-modal-content {
+    background: #fff;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    margin: 10% auto;
+    padding: 25px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .feedback-modal-content h2 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .submit-btn {
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .submit-btn:hover {
+    background-color: #009e86;
+  }
+</style>
+
+<!-- Floating WhatsApp + Call Buttons -->
+<div class="floating-buttons">
+  <a href="https://wa.me/919898490511" target="_blank" class="whatsapp-btn" title="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  <a href="tel:+919898490511" class="call-btn" title="Call">
+    <i class="fas fa-phone-alt"></i>
+  </a>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-container">
+    <!-- About / Logo -->
+    <div class="footer-col about">
+      <h3>EVOLVE MOTOCORP</h3>
+      <p>
+        Driving the future of electric mobility. Explore, book, and experience eco-friendly rides with EVOLVE MOTOCORP.
+      </p>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/" target="_blank" title="Facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <!-- <a href="https://twitter.com/" target="_blank" title="Twitter">
+          <i class="fab fa-twitter"></i>
+        </a> -->
+        <a href="https://www.instagram.com/evolvemotocorp/?igsh=NHUxZTJ2NmJmdDM5" target="_blank" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <!-- <a href="https://www.linkedin.com/" target="_blank" title="LinkedIn">
+          <i class="fab fa-linkedin-in"></i>
+        </a> -->
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#brochure">Brochure</a></li>
+        <li><a href="#evmodels">EV Models</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Policies -->
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="#terms">Terms & Conditions</a></li>
+        <li><a href="#privacy">Privacy Policy</a></li>
+        <li><a href="#refund">Refund Policy</a></li>
+        <li><a href="#disclaimer">Disclaimer</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Info -->
+   <div class="footer-col">
+  <h4>Contact Us</h4>
+  <ul>
+     <li>
+      📍 Shop No.-21, Vimal Paras, Shopping Center, Disa Bazar,
+      <br> Banaskantha, Deesa, Gujarat, India, 385535
+    </li>
+    <li>
+      📍 PLOT NO. 75, SHANTINAGAR SOCIETY, Rajmandir Multiplex,
+      <br> SHANTINAGAR SOCIETY, Deesa, Banaskantha, Gujarat, 385535
+    </li>
+    <li>
+      📞 <a href="tel:+919327274109" class="contact-link">+91 93272 74109</a>
+    </li>
+    <li>
+      ✉ <a href="mailto:info@evolvemotocorp.com" class="contact-link">info@evolvemotocorp.com</a>
+    </li>
+  </ul>
+</div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 EVOLVE MOTOCORP | All Rights Reserved</p>
+  </div>
+</footer>
+
+<!-- Feedback Modal -->
+<div id="feedback-modal" class="feedback-modal">
+  <div class="feedback-modal-content">
+    <span class="close-btn">&times;</span>
+    <h2>We Value Your Feedback</h2>
+    <form id="feedbackForm">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div class="form-group">
+        <label for="mobile">Mobile Number</label>
+        <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div class="form-group">
+        <label for="message">Your Feedback</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Submit</button>
+      <p id="feedback-status"></p>
+    </form>
+  </div>
+</div>
