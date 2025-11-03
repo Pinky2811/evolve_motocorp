@@ -1,27 +1,26 @@
-# ========================
-# 1️⃣ Build Stage
-# ========================
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# ---------- Build Stage ----------
+FROM eclipse-temurin:21-jdk AS build
+
 WORKDIR /app
 
-# Copy Maven config and source
+# Copy Maven files first (for caching)
 COPY pom.xml .
 COPY src ./src
 
-# Build the application (skip tests for speed)
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
+# Build the project (skip tests for faster build)
 RUN mvn clean package -DskipTests
 
-# ========================
-# 2️⃣ Run Stage
-# ========================
-FROM openjdk:17-jdk-slim
+# ---------- Run Stage ----------
+FROM eclipse-temurin:21-jre
+
 WORKDIR /app
 
-# Copy built jar from the build stage
+# Copy the JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose your Spring Boot port
 EXPOSE 8080
 
-# Run the jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
