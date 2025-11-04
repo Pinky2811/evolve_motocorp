@@ -1,28 +1,28 @@
 # ================================
-# 🏗️ Stage 1 — Build the application
+# 🚧 Stage 1 — Build the project
 # ================================
 FROM maven:3.9.9-eclipse-temurin-21 AS build
+
 WORKDIR /app
 
-# Copy pom.xml first and cache dependencies
+# Copy pom.xml and download dependencies (layer caching)
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline
 
-# Copy source code and build (skip tests for faster deploy)
+# Copy source and build
 COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ================================
 # 🚀 Stage 2 — Run the application
 # ================================
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
+
 WORKDIR /app
 
-# Copy the JAR from build stage
+# Copy the jar from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port
 EXPOSE 8080
 
-# Start Spring Boot app
 ENTRYPOINT ["java", "-jar", "app.jar"]
