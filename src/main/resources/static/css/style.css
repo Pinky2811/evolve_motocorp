@@ -69,12 +69,34 @@ footer {
   position: relative;
   z-index: 1001;
 }
-.logo { font-size: 20px; font-weight: bold; }
+
+/* ===== Logo Styling ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.logo img.site-logo {
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+
+/* ===== Nav Links ===== */
 .nav-links { display: flex; gap: 1.5em; }
 .nav-links a {
   color: var(--white);
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.3s;
 }
 .nav-links a:hover { color: var(--primary-green); }
 .hamburger { display: none; font-size: 26px; cursor: pointer; }
@@ -111,6 +133,7 @@ footer {
 @media (max-width: 768px) {
   .hamburger { display: block; }
   .nav-links { display: none; }
+  .logo img { height: 40px; }
 }
 
 /* ================================
@@ -295,4 +318,3 @@ form input[type="submit"]:hover { background: #005999; }
   text-align: center;
   font-weight: bold;
 }
-

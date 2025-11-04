@@ -1,7 +1,8 @@
-### Build and packaging files ###
+### Build and Packaging ###
 /target/
+!/src/
+!/pom.xml
 /build/
-/out/
 *.jar
 *.war
 *.zip
@@ -31,6 +32,10 @@ Thumbs.db
 logs/
 nohup.out
 
-### Dependency directories ###
+### Dependencies ###
 node_modules/
 .mvn/wrapper/maven-wrapper.jar
+
+### Render / Deployment ###
+.env
+*.orig
