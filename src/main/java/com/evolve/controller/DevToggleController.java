@@ -3,6 +3,11 @@ package com.evolve.controller;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
+@CrossOrigin(origins = {
+        "https://evolvemotocorp.com",
+        "https://www.evolvemotocorp.com",
+        "http://localhost:8080"
+})
 @RestController
 public class DevToggleController {
 

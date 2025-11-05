@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Fetch voucher from backend
-  $.get("vouchers", function (voucher) {
+$.get(`${BASE_URL}/vouchers`, function (voucher) {
     if (voucher) {
       $('#voucher-form').html(`
         <div class="col-md-6">
@@ -55,7 +55,7 @@ $(document).ready(function () {
     $("#payBtn").prop("disabled", true).text("Processing...");
 
     // Call backend to create Razorpay order
-    $.post("create_order", { amount: 360 }, function (order) {
+$.post(`${BASE_URL}/create_order`, { amount: 360 }, function (order) {
       let orderData = (typeof order === "string") ? JSON.parse(order) : order;
 
       var options = {
@@ -66,7 +66,7 @@ $(document).ready(function () {
         "description": "EV Pre-Booking Voucher",
         "order_id": orderData.id,
         "handler": function (response) {
-          console.log("✅ Payment Success:", response);
+          // console.log("✅ Payment Success:", response);
 
           const formData = {
             razorpay_order_id: response.razorpay_order_id,
@@ -79,7 +79,7 @@ $(document).ready(function () {
             couponNo: form.couponNo.value
           };
 
-          $.post("/confirm", formData, function (res) {
+$.post(`${BASE_URL}/confirm`, formData, function (response) {
             if (res.status === "success") {
               new bootstrap.Toast(document.getElementById('successToast')).show();
               setTimeout(() => location.reload(), 3000);

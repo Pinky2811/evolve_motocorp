@@ -51,7 +51,7 @@ window.location.href = "/Evolve_Ev/error.html";
     .then(res => res.text())
     .then(txt => {
       if (txt.includes("true")) {
-        console.log("✅ Dev mode active — inspect tools allowed.");
+        // console.log("✅ Dev mode active — inspect tools allowed.");
       } else {
         DisableDevtool();
       }

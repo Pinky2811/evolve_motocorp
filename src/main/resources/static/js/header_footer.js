@@ -55,7 +55,7 @@ $(document).ready(function () {
 
       // Collect data
       let formData = { name, mobile, email, message };
-      console.log("Feedback submitted:", formData);
+      // console.log("Feedback submitted:", formData);
 
       // TODO: send to backend/email API here
       $("#feedback-status").text("✅ Thank you for your feedback!");

@@ -9,14 +9,20 @@ if (!window.evModelsLoaded) {
 
   window.loadEvModelsPage = function () {
     const $list = $('#ev-model-list');
+    $("#loader").removeClass("d-none");
 
-    $.get("getAllModels", function (evModels) {
+    $.get(`${BASE_URL}/getAllModels`, function (evModels) {
+      $("#loader").addClass("d-none");
       allModels = evModels;
       filteredModels = [...allModels];
       renderModels(getPageModels(filteredModels, currentPage), true);
       toggleLoadMoreButton();
+    }).fail(() => {
+      $("#loader").addClass("d-none");
+      $list.html(`<div class="text-center text-danger">Failed to load models.</div>`);
     });
 
+    // Event bindings
     $('#rangeFilter').off('change').on('change', function () {
       applyFilters(true);
     });
@@ -30,91 +36,90 @@ if (!window.evModelsLoaded) {
       renderModels(getPageModels(filteredModels, currentPage), false);
       toggleLoadMoreButton();
     });
-    $('#searchInput').off('input').on('input', applyFilters);
 
+    $('#searchInput').off('input').on('input', applyFilters);
   };
 
+  // Render model cards
   function renderModels(models, reset = false) {
     const $list = $('#ev-model-list');
     if (reset) $list.empty();
 
     if (currentPage === 1 && models.length === 0) {
-      $list.html(`
-        <div class="text-center text-muted">
-          <p>No models match your filter.</p>
-          <button class="btn btn-outline-secondary mt-3" id="suggestModelBtn">Suggest a Model</button>
-        </div>
-      `);
-
+      $list.html(`<div class="text-center text-muted"><p>No models found.</p></div>`);
       $('#loadMoreBtn').addClass('d-none');
-
-      $('#suggestModelBtn').off('click').on('click', function () {
-        alert("Thank you for your interest! We'll soon let you suggest a model.");
-      });
       return;
     }
 
     models.forEach((model, index) => {
-      const globalIndex = (currentPage - 1) * modelsPerPage + index;
-      const featuresHTML = model.features.map(f => `<li>✅ ${f}</li>`).join("");
+      const featuresHTML = (model.features || []).map(f => `<li>✅ ${f}</li>`).join("");
+      const imgSrc = model.imagePath
+        ? `${BASE_URL}/${model.imagePath}`
+        : '/images/no-image.png';
+
       $list.append(`
         <div class="col-md-6 col-lg-4 mb-4 d-flex" data-aos="fade-up" data-aos-delay="${index * 100}">
           <div class="card h-100 shadow-sm rounded-4 flex-fill">
-            <img src="uploads/ev_models/${model.imageUrl}" class="card-img-top rounded-top-4" alt="${model.name}">
+            <img src="${imgSrc}" class="card-img-top rounded-top-4" alt="${model.modelName}">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title text-success">${model.name}</h5>
+              <h5 class="card-title text-success">${model.modelName}</h5>
               <h6 class="card-subtitle mb-2 text-muted">₹${model.price}</h6>
               <ul class="list-unstyled small mb-3">${featuresHTML}</ul>
-              <button class="btn btn-outline-primary mt-auto view-details-btn" data-index="${globalIndex}">View Details</button>
+              <button class="btn btn-outline-primary mt-auto view-details-btn" data-id="${model.id}">View Details</button>
             </div>
           </div>
         </div>
       `);
     });
 
+    // Attach modal open events
     $('.view-details-btn').off('click').on('click', function () {
-      const index = $(this).data('index');
-      const model = filteredModels[index];
-      showDetailsModal(model);
+      const id = $(this).data('id');
+      const model = allModels.find(m => m.id === id);
+      if (model) showDetailsModal(model);
     });
   }
 
+  // Filter and sort
   function applyFilters() {
-  const range = $('#rangeFilter').val();
-  const sort = $('#sortPrice').val();
-  const search = $('#searchInput').val().toLowerCase().trim();
-  let filtered = [...allModels];
+    const range = $('#rangeFilter').val();
+    const sort = $('#sortPrice').val();
+    const search = $('#searchInput').val().toLowerCase().trim();
+    let filtered = [...allModels];
 
-  if (range) {
-    filtered = filtered.filter(model => {
-      const kmFeature = model.features.find(f => f.toLowerCase().includes("km"));
-      const km = kmFeature ? parseInt(kmFeature.replace(/[^\d]/g, "")) : 0;
-      if (range === "below100") return km < 100;
-      if (range === "100to150") return km >= 100 && km <= 150;
-      if (range === "above150") return km > 150;
-    });
+    // ✅ FIX 1: use model.modelName (not model.name)
+    if (search) {
+      filtered = filtered.filter(model =>
+        model.modelName.toLowerCase().includes(search) ||
+        model.features.some(f => f.toLowerCase().includes(search))
+      );
+    }
+
+    if (range) {
+      filtered = filtered.filter(model => {
+        const kmFeature = model.features.find(f => f.toLowerCase().includes("km"));
+        const km = kmFeature ? parseInt(kmFeature.replace(/[^\d]/g, "")) : 0;
+        if (range === "below100") return km < 100;
+        if (range === "100to150") return km >= 100 && km <= 150;
+        if (range === "above150") return km > 150;
+        return true;
+      });
+    }
+
+    // ✅ FIX 2: handle numeric price values safely
+    if (sort === "asc") {
+      filtered.sort((a, b) => parseInt(a.price) - parseInt(b.price));
+    } else if (sort === "desc") {
+      filtered.sort((a, b) => parseInt(b.price) - parseInt(a.price));
+    }
+
+    updateActiveFilters(range, sort, search);
+
+    filteredModels = filtered;
+    currentPage = 1;
+    renderModels(getPageModels(filteredModels, currentPage), true);
+    toggleLoadMoreButton();
   }
-
-  if (search) {
-    filtered = filtered.filter(model =>
-      model.name.toLowerCase().includes(search) ||
-      model.features.some(f => f.toLowerCase().includes(search))
-    );
-  }
-
-  if (sort === "asc") {
-    filtered.sort((a, b) => parseInt(a.price.replace(/[^\d]/g, "")) - parseInt(b.price.replace(/[^\d]/g, "")));
-  } else if (sort === "desc") {
-    filtered.sort((a, b) => parseInt(b.price.replace(/[^\d]/g, "")) - parseInt(a.price.replace(/[^\d]/g, "")));
-  }
-
-  updateActiveFilters(range, sort, search);
-
-  currentPage = 1;
-  renderModels(getPageModels(filtered, currentPage));
-  updatePagination(filtered.length);
-}
-
 
   function getPageModels(models, page) {
     const start = (page - 1) * modelsPerPage;
@@ -131,64 +136,63 @@ if (!window.evModelsLoaded) {
     }
   }
 
+  // ✅ FIX 3: consistent field names for modal
   function showDetailsModal(model) {
-    $('#modalImage').attr('src', `uploads/ev_models/${model.imageUrl}`);
-    $('#modalName').text(model.name);
+    const imgSrc = model.imagePath ? `${BASE_URL}/${model.imagePath}` : '/images/no-image.png';
+    $('#modalImage').attr('src', imgSrc);
+    $('#modalName').text(model.modelName);
     $('#modalPrice').text(`₹${model.price}`);
-    $('#modalFeatures').html(model.features.map(f => `<li>✅ ${f}</li>`).join(""));
-
+    $('#modalFeatures').html((model.features || []).map(f => `<li>✅ ${f}</li>`).join(""));
     const modal = new bootstrap.Modal(document.getElementById('evDetailsModal'));
     modal.show();
   }
 
- function updateActiveFilters(range, sort, search) {
-  const $chipContainer = $('#filter-chips');
-  $chipContainer.empty();
-  let hasFilter = false;
+  function updateActiveFilters(range, sort, search) {
+    const $chipContainer = $('#filter-chips');
+    $chipContainer.empty();
+    let hasFilter = false;
 
-  if (range) {
-    hasFilter = true;
-    let label = '';
-    if (range === 'below100') label = 'Below 100km';
-    else if (range === '100to150') label = '100–150km';
-    else if (range === 'above150') label = 'Above 150km';
+    if (range) {
+      hasFilter = true;
+      let label = '';
+      if (range === 'below100') label = 'Below 100km';
+      else if (range === '100to150') label = '100–150km';
+      else if (range === 'above150') label = 'Above 150km';
 
-    $chipContainer.append(`
-      <span class="badge bg-success me-2 filter-chip" data-type="range">
-        Range: ${label} ✕
-      </span>
-    `);
+      $chipContainer.append(`
+        <span class="badge bg-success me-2 filter-chip" data-type="range">
+          Range: ${label} ✕
+        </span>
+      `);
+    }
+
+    if (sort) {
+      hasFilter = true;
+      const sortLabel = sort === 'asc' ? 'Price: Low to High' : 'Price: High to Low';
+      $chipContainer.append(`
+        <span class="badge bg-primary me-2 filter-chip" data-type="sort">
+          ${sortLabel} ✕
+        </span>
+      `);
+    }
+
+    if (search) {
+      hasFilter = true;
+      $chipContainer.append(`
+        <span class="badge bg-dark me-2 filter-chip" data-type="search">
+          Search: "${search}" ✕
+        </span>
+      `);
+    }
+
+    $('#active-filters').toggle(hasFilter);
+
+    $('.filter-chip').off('click').on('click', function () {
+      const type = $(this).data('type');
+      if (type === 'range') $('#rangeFilter').val('');
+      if (type === 'sort') $('#sortPrice').val('');
+      if (type === 'search') $('#searchInput').val('');
+      applyFilters();
+    });
   }
-
-  if (sort) {
-    hasFilter = true;
-    const sortLabel = sort === 'asc' ? 'Price: Low to High' : 'Price: High to Low';
-    $chipContainer.append(`
-      <span class="badge bg-primary me-2 filter-chip" data-type="sort">
-        ${sortLabel} ✕
-      </span>
-    `);
-  }
-
-  if (search) {
-    hasFilter = true;
-    $chipContainer.append(`
-      <span class="badge bg-dark me-2 filter-chip" data-type="search">
-        Search: "${search}" ✕
-      </span>
-    `);
-  }
-
-  $('#active-filters').toggle(hasFilter);
-
-  // Remove chip behavior
-  $('.filter-chip').off('click').on('click', function () {
-    const type = $(this).data('type');
-    if (type === 'range') $('#rangeFilter').val('');
-    if (type === 'sort') $('#sortPrice').val('');
-    if (type === 'search') $('#searchInput').val('');
-    applyFilters();
-  });
-}
-
 }

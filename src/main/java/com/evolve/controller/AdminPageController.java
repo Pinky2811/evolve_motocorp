@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
+@CrossOrigin(origins = {
+        "https://evolvemotocorp.com",
+        "https://www.evolvemotocorp.com",
+        "http://localhost:8080"
+})
 @RestController
 public class AdminPageController {
 
@@ -83,23 +88,24 @@ public class AdminPageController {
     }
 
     @PostMapping("/vouchers_generate")
-    public ResponseEntity<String> generateVouchers(@RequestBody VoucherRangeRequest request) {
-        try {
-            int createdCount = 0;
-            int skippedCount = 0;
+    public ResponseEntity<Map<String, Object>> generateVouchers(@RequestBody VoucherRangeRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        List<String> duplicates = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
 
-            int receiptStart = extractNumericPart(request.getReceiptStart());
-            int receiptEnd = extractNumericPart(request.getReceiptEnd());
-            int couponStart = extractNumericPart(request.getCouponStart());
+        int createdCount = 0;
+        int receiptStart = extractNumericPart(request.getReceiptStart());
+        int receiptEnd = extractNumericPart(request.getReceiptEnd());
+        int couponStart = extractNumericPart(request.getCouponStart());
 
-            for (int i = 0; i <= (receiptEnd - receiptStart); i++) {
-                String receiptNo = formatWithPrefix("EVG", receiptStart + i, 5);
-                String couponNo = formatWithPrefix("EV", couponStart + i, 5);
+        for (int i = 0; i <= (receiptEnd - receiptStart); i++) {
+            String receiptNo = formatWithPrefix("EVG", receiptStart + i, 5);
+            String couponNo = formatWithPrefix("EV", couponStart + i, 5);
 
-                // ✅ Skip if already exists
-                boolean exists = voucherRepo.existsByReceiptNo(receiptNo);
-                if (exists) {
-                    skippedCount++;
+            try {
+                // ✅ Check for existing voucher before saving
+                if (voucherRepo.existsByReceiptNo(receiptNo)) {
+                    duplicates.add(receiptNo);
                     continue;
                 }
 
@@ -111,19 +117,28 @@ public class AdminPageController {
 
                 voucherRepo.save(voucher);
                 createdCount++;
+
+            } catch (Exception e) {
+                errors.add(receiptNo + " (" + e.getMessage() + ")");
             }
-
-            String message = "✅ " + createdCount + " vouchers generated successfully.";
-            if (skippedCount > 0) {
-                message += " ⚠️ " + skippedCount + " duplicates were skipped.";
-            }
-
-            return ResponseEntity.ok(message);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body("❌ Error generating vouchers: " + e.getMessage());
         }
+
+        // ✅ Build clean message
+        String message = "✅ " + createdCount + " vouchers generated successfully.";
+        if (!duplicates.isEmpty()) {
+            message += " ⚠️ Skipped " + duplicates.size() + " duplicates.";
+        }
+        if (!errors.isEmpty()) {
+            message += " ❌ " + errors.size() + " failed to save due to errors.";
+        }
+
+        response.put("message", message);
+        response.put("created", createdCount);
+        response.put("duplicates", duplicates);
+        response.put("errors", errors);
+
+        // ✅ Return 200 always with detailed info
+        return ResponseEntity.ok(response);
     }
 
     private int extractNumericPart(String code) {

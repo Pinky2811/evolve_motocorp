@@ -1,4 +1,7 @@
 
+// ==============================
+// 👁️ Toggle Password Visibility
+// ==============================
 function togglePasswordVisibility() {
   const passwordInput = document.getElementById('password');
   const eyeIcon = document.getElementById('eye-icon');
@@ -14,7 +17,9 @@ function togglePasswordVisibility() {
   }
 }
 
-// ✅ Check admin session on load
+// ==============================
+// 🔐 Admin Login Session Handling
+// ==============================
 $(document).ready(function () {
   if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
     showAdminPanel();
@@ -23,7 +28,7 @@ $(document).ready(function () {
     $("#login-section").removeClass("d-none");
   }
 
-  // 🧭 "Manage EV Models" button click → go to new page
+  // 🧭 Manage EV Models → redirect
   $("#manage-evmodels-btn").click(function () {
     window.location.href = 'admin_evmodels.html';
   });
@@ -43,7 +48,9 @@ function hideAdminPanel() {
   $("#unused-voucher-section").addClass("d-none");
 }
 
-// ✅ Login
+// ==============================
+// 🔑 Login
+// ==============================
 $("#admin-login-form").on("submit", function (e) {
   e.preventDefault();
 
@@ -56,17 +63,13 @@ $("#admin-login-form").on("submit", function (e) {
   }
 
   $.ajax({
-    url: "login",
+    url: `${BASE_URL}/login`,
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify({ username, password }),
     success: function () {
       alert("✅ Login successful!");
-
-      // 🔐 Save session locally
       sessionStorage.setItem('isAdminLoggedIn', 'true');
-
-      // Show admin panel
       showAdminPanel();
       loadPrebookings();
     },
@@ -76,19 +79,23 @@ $("#admin-login-form").on("submit", function (e) {
   });
 });
 
-// ✅ Logout
+// ==============================
+// 🚪 Logout
+// ==============================
 $("#logout-btn").click(function () {
   if (confirm("Logout and return to login?")) {
-          sessionStorage.removeItem("isAdminLoggedIn");
-          $.post("logout", function () {
-            window.location.href = loginRedirect;
-          });
-        }
+    sessionStorage.removeItem("isAdminLoggedIn");
+    $.post(`${BASE_URL}/logout`, function () {
+      location.reload();
+    });
+  }
 });
 
-// Load Prebookings
+// ==============================
+// 📄 Load Prebookings
+// ==============================
 function loadPrebookings() {
-  $.get("all_prebookings", function (data) {
+  $.get(`${BASE_URL}/all_prebookings`, function (data) {
     const tbody = $("#admin-table-body");
     tbody.empty();
 
@@ -128,7 +135,9 @@ function loadPrebookings() {
   });
 }
 
-// Voucher Range Calculator
+// ==============================
+// 🔢 Voucher Range Calculator
+// ==============================
 function calculateEnd(startValue, range) {
   if (!startValue || !range) return "";
   const prefix = startValue.match(/^\D+/)[0];
@@ -150,8 +159,15 @@ $("#rangeCount, #receiptStart, #couponStart").on("input", function () {
   }
 });
 
-// Voucher Generate
-$("#voucherForm").on("submit", function (e) {
+// ==============================
+// 🎫 Voucher Generation
+// ==============================
+// Ensure only one binding even if the page is reloaded dynamically
+// ==============================
+// 🎫 Voucher Generation
+// ==============================
+// Ensure only one binding even if the page is reloaded dynamically
+$(document).off("submit", "#voucherForm").on("submit", "#voucherForm", function (e) {
   e.preventDefault();
 
   const receiptStart = $("#receiptStart").val().trim();
@@ -159,23 +175,62 @@ $("#voucherForm").on("submit", function (e) {
   const couponStart = $("#couponStart").val().trim();
   const couponEnd = $("#couponEnd").val().trim();
 
+  if (!receiptStart || !receiptEnd || !couponStart || !couponEnd) {
+    alert("⚠️ Please fill in all fields before generating vouchers.");
+    return;
+  }
+
+  // Disable submit button to prevent double click
+  const $submitBtn = $("#voucherForm button[type='submit']");
+  $submitBtn.prop("disabled", true).text("Generating...");
+
   $.ajax({
-    url: "vouchers_generate",
+    url: `${BASE_URL}/vouchers_generate`,
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ receiptStart, receiptEnd, couponStart, couponEnd }),
+    data: JSON.stringify({
+      receiptStart,
+      receiptEnd,
+      couponStart,
+      couponEnd
+    }),
     success: function (response) {
-      $("#voucherStatus").html(`<div class="alert alert-success">${response}</div>`);
+      if (response && response.message) {
+        alert("✅ " + response.message);
+      } else {
+        alert("✅ Vouchers generated successfully!");
+      }
+
+      // 🌀 Auto reload after 1.5 seconds (for updated voucher list)
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
     },
     error: function (xhr) {
-      $("#voucherStatus").html(`<div class="alert alert-danger">Error: ${xhr.responseText}</div>`);
+      // Custom friendly message for duplicates
+      if (
+        xhr.responseText &&
+        xhr.responseText.includes("duplicate key value violates unique constraint")
+      ) {
+        alert("⚠️ Some vouchers were already generated earlier. Skipped duplicates.");
+      } else {
+        alert("❌ Error generating vouchers: " + (xhr.responseText || "Please try again."));
+      }
+    },
+    complete: function () {
+      // Re-enable button after request completes
+      $submitBtn.prop("disabled", false).text("Generate");
     }
   });
 });
 
-// Load Unused Vouchers
+
+
+// ==============================
+// 🧾 Load Unused Vouchers
+// ==============================
 $("#load-unused-btn").on("click", function () {
-  $.get("unused_vouchers", function (data) {
+  $.get(`${BASE_URL}/unused_vouchers`, function (data) {
     const tbody = $("#unusedVoucherBody");
     tbody.empty();
 
@@ -205,7 +260,9 @@ $("#load-unused-btn").on("click", function () {
   });
 });
 
-// 🔑 Delete Vouchers
+// ==============================
+// 🗑️ Delete Selected Vouchers
+// ==============================
 $("#deleteVoucherForm").on("submit", function (e) {
   e.preventDefault();
 
@@ -220,7 +277,7 @@ $("#deleteVoucherForm").on("submit", function (e) {
   }
 
   $.ajax({
-    url: "delete_vouchers",
+    url: `${BASE_URL}/delete_vouchers`,
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(selected),
@@ -234,7 +291,9 @@ $("#deleteVoucherForm").on("submit", function (e) {
   });
 });
 
-// ✅ Select All checkbox functionality with max 10 limit
+// ==============================
+// ☑️ Select-All (Max 10 Limit)
+// ==============================
 $(document).on("change", "#select-all", function () {
   const isChecked = $(this).prop("checked");
   const checkboxes = $(".voucher-check");
@@ -247,7 +306,7 @@ $(document).on("change", "#select-all", function () {
   }
 });
 
-// ✅ Individual checkbox logic
+// ✅ Individual checkbox limit
 $(document).on("change", ".voucher-check", function () {
   const checked = $(".voucher-check:checked").length;
 

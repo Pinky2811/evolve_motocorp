@@ -19,6 +19,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = {
+        "https://evolvemotocorp.com",
+        "https://www.evolvemotocorp.com",
+        "http://localhost:8080"
+})
 @RestController
 public class PaymentController {
 
