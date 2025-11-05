@@ -40,7 +40,7 @@ $.get(`${BASE_URL}/vouchers`, function (voucher) {
       $('#voucher-form').html(`<p class="text-danger text-center">No vouchers available right now.</p>`);
     }
   }).fail(function () {
-    $('#voucher-form').html(`<p class="text-danger text-center">⚠ Error loading voucher. Please try again later.</p>`);
+    $('#voucher-form').html(`<p class="text-danger text-center">⚠ vouchers available After Some Time.</p>`);
   });
 
   // Razorpay Payment Button
@@ -101,7 +101,7 @@ $.post(`${BASE_URL}/confirm`, formData, function (response) {
       });
       rzp1.open();
     }).fail(function () {
-      alert("⚠ Error creating order. Please try again.");
+      alert("Something Went Wrong. Please try again.");
       $("#payBtn").prop("disabled", false).text("Pay ₹360 & Pre-Book");
     });
   });

@@ -22,6 +22,7 @@ import java.util.Map;
 @CrossOrigin(origins = {
         "https://evolvemotocorp.com",
         "https://www.evolvemotocorp.com",
+        "https://evolve-backend.onrender.com", // optional
         "http://localhost:8080"
 })
 @RestController

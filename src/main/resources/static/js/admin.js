@@ -214,7 +214,7 @@ $(document).off("submit", "#voucherForm").on("submit", "#voucherForm", function 
       ) {
         alert("⚠️ Some vouchers were already generated earlier. Skipped duplicates.");
       } else {
-        alert("❌ Error generating vouchers: " + (xhr.responseText || "Please try again."));
+        alert("❌ generating vouchers: " + (xhr.responseText || "Please try again."));
       }
     },
     complete: function () {

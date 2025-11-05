@@ -227,3 +227,19 @@ body {
     font-size: 1.3rem;
   }
 }
+/* Keep content clear of the fixed header */
+html { scroll-padding-top: var(--header-h, 80px); }
+
+@media (max-width: 768px) {
+  :root { --header-h: 120px; }        /* header is taller on phones */
+  #main-content { padding-top: var(--header-h); }
+  .logo img.site-logo { height: 40px; } /* optional: slightly smaller logo */
+}
+
+/* (optional) if the header is even taller on very small phones */
+@media (max-width: 420px) {
+  :root { --header-h: 136px; }
+}
+@media (max-width: 768px) {
+  #main-content { padding-top: 120px; }
+}
