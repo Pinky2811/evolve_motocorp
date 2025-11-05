@@ -17,7 +17,7 @@ import java.util.Optional;
 @CrossOrigin(origins = {
         "https://evolvemotocorp.com",
         "https://www.evolvemotocorp.com",
-        "https://evolve-backend.onrender.com", // optional
+        "https://evolve-motocorp-1.onrender.com", // optional
         "http://localhost:8080"
 })
 

@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                                 .allowedOriginPatterns(
                                                 "https://evolvemotocorp.com",
                                                 "https://www.evolvemotocorp.com",
-                                                "https://evolve-backend.onrender.com", // optional
+                                                "https://evolve-motocorp-1.onrender.com", // optional
                                                 "http://localhost:*",
                                                 "http://127.0.0.1:*")
                                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
