@@ -35,4 +35,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Modifying
     @Query("DELETE FROM Voucher v WHERE v.receiptNo = :receiptNo")
     void deleteByReceiptNo(@Param("receiptNo") String receiptNo);
+
+    boolean existsByReceiptNo(String receiptNo);
+
 }

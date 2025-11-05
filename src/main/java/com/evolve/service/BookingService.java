@@ -6,6 +6,7 @@ import com.evolve.model.Prebooking;
 import com.evolve.model.Voucher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookingService {
@@ -16,6 +17,7 @@ public class BookingService {
     @Autowired
     private PrebookingRepository prebookingRepo;
 
+    @Transactional
     public Prebooking confirmBooking(String name, String address, String mobile) {
         // 1. Get one unused voucher
         Voucher voucher = voucherRepo.findFirstByUsedFalse();

@@ -8,11 +8,11 @@ $(document).ready(function () {
             <form id="prebook-form" novalidate>
               <div class="mb-3">
                 <label class="form-label">Receipt No</label>
-<input type="text" class="form-control" name="receiptNo" value="${voucher.receiptNo || ''}" readonly>
+                <input type="text" class="form-control" name="receiptNo" value="${voucher.receiptNo || ''}" readonly>
               </div>
               <div class="mb-3">
                 <label class="form-label">Coupon No</label>
-<input type="text" class="form-control" name="couponNo" value="${voucher.couponNo || ''}" readonly>
+                <input type="text" class="form-control" name="couponNo" value="${voucher.couponNo || ''}" readonly>
               </div>
               <div class="mb-3">
                 <label class="form-label">Full Name</label>
@@ -51,59 +51,58 @@ $(document).ready(function () {
       return;
     }
 
+    // Disable button to prevent double click
+    $("#payBtn").prop("disabled", true).text("Processing...");
+
     // Call backend to create Razorpay order
     $.post("create_order", { amount: 360 }, function (order) {
       let orderData = (typeof order === "string") ? JSON.parse(order) : order;
 
       var options = {
-        "key": "rzp_test_XXXXX", // ✅ Replace with your Razorpay Key ID
+        "key": "rzp_live_RbzgMYaL9gfRdw", // ✅ Your LIVE key
         "amount": orderData.amount,
         "currency": "INR",
         "name": "EVOLVE MOTOCORP",
         "description": "EV Pre-Booking Voucher",
         "order_id": orderData.id,
         "handler": function (response) {
-          // Payment success → submit form to save booking
-          console.log("Payment Success:", response);
-          $("#prebook-form").trigger("submit");
+          console.log("✅ Payment Success:", response);
+
+          const formData = {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            name: form.name.value.trim(),
+            address: form.address.value.trim(),
+            mobile: form.contact.value.trim(),
+            receiptNo: form.receiptNo.value,
+            couponNo: form.couponNo.value
+          };
+
+          $.post("/confirm", formData, function (res) {
+            if (res.status === "success") {
+              new bootstrap.Toast(document.getElementById('successToast')).show();
+              setTimeout(() => location.reload(), 3000);
+            } else {
+              alert("⚠ Payment verification failed!");
+              $("#payBtn").prop("disabled", false).text("Pay ₹360 & Pre-Book");
+            }
+          }).fail(() => {
+            alert("⚠ Server error during confirmation.");
+            $("#payBtn").prop("disabled", false).text("Pay ₹360 & Pre-Book");
+          });
         },
         "theme": { "color": "#3399cc" }
       };
-      var rzp1 = new Razorpay(options);
+
+      const rzp1 = new Razorpay(options);
+      rzp1.on('payment.failed', function () {
+        $("#payBtn").prop("disabled", false).text("Pay ₹360 & Pre-Book");
+      });
       rzp1.open();
-    });
-  });
-
-  // Form submit handler (after successful payment)
-  $(document).on("submit", "#prebook-form", function (e) {
-    e.preventDefault();
-    const form = this;
-
-    const bookingData = {
-  name: form.name.value.trim(),
-  address: form.address.value.trim(),
-  contact: form.contact.value.trim(),
-  voucher: {
-    receiptNo: form.receiptNo.value,
-    couponNo: form.couponNo.value
-  }
-};
-
-
-    $.ajax({
-      url: "prebooking",
-      type: "POST",
-      contentType: "application/json",
-      data: JSON.stringify(bookingData),
-      success: function () {
-        form.reset();
-        form.classList.remove('was-validated');
-        new bootstrap.Toast(document.getElementById('successToast')).show();
-        setTimeout(() => location.reload(), 3000);
-      },
-      error: function () {
-        alert("⚠ This voucher is already booked or invalid.");
-      }
+    }).fail(function () {
+      alert("⚠ Error creating order. Please try again.");
+      $("#payBtn").prop("disabled", false).text("Pay ₹360 & Pre-Book");
     });
   });
 });

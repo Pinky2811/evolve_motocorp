@@ -71,6 +71,7 @@ footer {
 }
 
 /* ===== Logo Styling ===== */
+/* ===== Logo Styling ===== */
 .logo {
   display: flex;
   align-items: center;
@@ -82,13 +83,33 @@ footer {
 }
 
 .logo img.site-logo {
-  height: 45px;
-  width: 45px;
+  height: 48px;
+  width: auto;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #fff;
+  background: radial-gradient(circle, #000 40%, transparent 70%);
+  border: none;
+  box-shadow: 0 0 10px rgba(43, 179, 0, 0.4);
+}
+.logo img.site-logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(43, 179, 0, 0.6);
+  transition: all 0.3s ease;
 }
 
+
+/* --- Brand Text beside logo --- */
+.brand-text {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(90deg, var(--primary-green), var(--coolant-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  user-select: none;
+}
 
 /* ===== Nav Links ===== */
 .nav-links { display: flex; gap: 1.5em; }

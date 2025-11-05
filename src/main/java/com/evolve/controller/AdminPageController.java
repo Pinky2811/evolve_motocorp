@@ -82,17 +82,26 @@ public class AdminPageController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("vouchers_generate")
+    @PostMapping("/vouchers_generate")
     public ResponseEntity<String> generateVouchers(@RequestBody VoucherRangeRequest request) {
         try {
-            List<Voucher> vouchers = new ArrayList<>();
+            int createdCount = 0;
+            int skippedCount = 0;
+
             int receiptStart = extractNumericPart(request.getReceiptStart());
             int receiptEnd = extractNumericPart(request.getReceiptEnd());
             int couponStart = extractNumericPart(request.getCouponStart());
 
             for (int i = 0; i <= (receiptEnd - receiptStart); i++) {
-                String receiptNo = formatWithPrefix("EV-", receiptStart + i, 6);
-                String couponNo = formatWithPrefix("CPN-", couponStart + i, 4);
+                String receiptNo = formatWithPrefix("EVG", receiptStart + i, 5);
+                String couponNo = formatWithPrefix("EV", couponStart + i, 5);
+
+                // ✅ Skip if already exists
+                boolean exists = voucherRepo.existsByReceiptNo(receiptNo);
+                if (exists) {
+                    skippedCount++;
+                    continue;
+                }
 
                 Voucher voucher = new Voucher();
                 voucher.setReceiptNo(receiptNo);
@@ -100,13 +109,20 @@ public class AdminPageController {
                 voucher.setDateAssigned(LocalDate.now());
                 voucher.setUsed(false);
 
-                vouchers.add(voucher);
+                voucherRepo.save(voucher);
+                createdCount++;
             }
 
-            voucherRepo.saveAll(vouchers);
-            return ResponseEntity.ok(vouchers.size() + " vouchers generated successfully.");
+            String message = "✅ " + createdCount + " vouchers generated successfully.";
+            if (skippedCount > 0) {
+                message += " ⚠️ " + skippedCount + " duplicates were skipped.";
+            }
+
+            return ResponseEntity.ok(message);
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to generate vouchers: " + e.getMessage());
+            return ResponseEntity.status(500)
+                    .body("❌ Error generating vouchers: " + e.getMessage());
         }
     }
 

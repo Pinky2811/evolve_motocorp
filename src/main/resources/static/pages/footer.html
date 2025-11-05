@@ -241,11 +241,19 @@
 </style>
 
 <!-- Floating WhatsApp + Call Buttons -->
+<!-- Floating WhatsApp + Call Buttons -->
 <div class="floating-buttons">
-  <a href="https://wa.me/919327274109" target="_blank" class="whatsapp-btn" title="Chat on WhatsApp">
+  <a href="https://wa.me/919327274109"
+     target="_blank"
+     rel="noopener"
+     class="whatsapp-btn"
+     aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
-  <a href="tel:+919327274109" class="call-btn" title="Call">
+
+  <a href="tel:+919327274109"
+     class="call-btn"
+     aria-label="Call Evolve Motocorp">
     <i class="fas fa-phone-alt"></i>
   </a>
 </div>
@@ -253,25 +261,21 @@
 <!-- Footer -->
 <footer class="site-footer">
   <div class="footer-container">
-    <!-- About / Logo -->
+
+    <!-- About -->
     <div class="footer-col about">
       <h3>EVOLVE MOTOCORP</h3>
       <p>
         Driving the future of electric mobility. Explore, book, and experience eco-friendly rides with EVOLVE MOTOCORP.
       </p>
+
       <div class="social-icons">
-        <a href="https://www.facebook.com/" target="_blank" title="Facebook">
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook">
           <i class="fab fa-facebook-f"></i>
         </a>
-        <!-- <a href="https://twitter.com/" target="_blank" title="Twitter">
-          <i class="fab fa-twitter"></i>
-        </a> -->
-        <a href="https://www.instagram.com/evolvemotocorp/?igsh=NHUxZTJ2NmJmdDM5" target="_blank" title="Instagram">
+        <a href="https://www.instagram.com/evolvemotocorp/?igsh=NHUxZTJ2NmJmdDM5" target="_blank" rel="noopener" aria-label="Instagram">
           <i class="fab fa-instagram"></i>
         </a>
-        <!-- <a href="https://www.linkedin.com/" target="_blank" title="LinkedIn">
-          <i class="fab fa-linkedin-in"></i>
-        </a> -->
       </div>
     </div>
 
@@ -299,52 +303,47 @@
     </div>
 
     <!-- Contact Info -->
-   <div class="footer-col">
-  <h4>Contact Us</h4>
-  <ul>
-     <li>
-      📍 Shop No.-21, Vimal Paras, Shopping Center, Disa Bazar,
-      <br> Banaskantha, Deesa, Gujarat, India, 385535
-    </li>
-    <li>
-      📞 <a href="tel:+919327274109" class="contact-link">+91 93272 74109</a>
-    </li>
-    <li>
-      ✉ <a href="mailto:info@evolvemotocorp.com" class="contact-link">info@evolvemotocorp.com</a>
-    </li>
-  </ul>
-</div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <ul>
+        <li>
+          📍 Shop No.-21, Vimal Paras, Shopping Center, Disa Bazar,<br>
+          Banaskantha, Deesa, Gujarat, India, 385535
+        </li>
+        <li>
+          📞 <a href="tel:+919327274109" class="contact-link" aria-label="Call +91 93272 74109">+91 93272 74109</a>
+        </li>
+        <li>
+          ✉ <a href="mailto:info@evolvemotocorp.com" class="contact-link" aria-label="Email info@evolvemotocorp.com">info@evolvemotocorp.com</a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <div class="footer-bottom">
-    <p>© 2025 EVOLVE MOTOCORP | All Rights Reserved</p>
+   <p>© 2025 EVOLVE MOTOCORP. All rights reserved. 
+Designed & Developed by Webvividtech.</p>
+
   </div>
 </footer>
 
-<!-- Feedback Modal -->
-<div id="feedback-modal" class="feedback-modal">
-  <div class="feedback-modal-content">
-    <span class="close-btn">&times;</span>
-    <h2>We Value Your Feedback</h2>
-    <form id="feedbackForm">
-      <div class="form-group">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" name="name" required />
-      </div>
-      <div class="form-group">
-        <label for="mobile">Mobile Number</label>
-        <input type="tel" id="mobile" name="mobile" pattern="[0-9]{10}" required />
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required />
-      </div>
-      <div class="form-group">
-        <label for="message">Your Feedback</label>
-        <textarea id="message" name="message" rows="4" required></textarea>
-      </div>
-      <button type="submit" class="submit-btn">Submit</button>
-      <p id="feedback-status"></p>
-    </form>
-  </div>
-</div>
+<!-- Optional Structured Data (helps Google show address) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Evolve Motocorp",
+  "image": "https://evolvemotocorp.com/images/logo/evolve_logo.png",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Shop No.-21, Vimal Paras, Shopping Center, Disa Bazar",
+    "addressLocality": "Deesa",
+    "addressRegion": "Gujarat",
+    "postalCode": "385535",
+    "addressCountry": "IN"
+  },
+  "telephone": "+91-9327274109",
+  "email": "info@evolvemotocorp.com",
+  "url": "https://evolvemotocorp.com"
+}
+</script>

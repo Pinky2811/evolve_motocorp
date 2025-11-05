@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Denied | Evolve Motocorp</title>
+<link rel="icon" type="image/png" href="images/logo/evolve_favicon_v2.png">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .error-container {
+      text-align: center;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      color: #00e0ff;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .redirect {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.3s, background 0.3s;
+      text-decoration: none;
+    }
+
+    .redirect:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #0072ff, #00c6ff);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <img src="images/logo/evolve_logo.png" alt="Evolve Motocorp Electric Vehicle Logo" class="logo">
+    <h1>🔒 Access Restricted</h1>
+    <p>Developer tools have been disabled to protect <strong>Evolve Motocorp</strong> resources.<br>
+    You’ll be redirected to the homepage shortly...</p>
+    <a href="/Evolve_Ev/index.html" class="redirect">Go to Home</a>
+  </div>
+
+  <div class="footer">
+    © 2025 Evolve Motocorp — Powered by EVOLVE.EV
+  </div>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = "/Evolve_Ev/index.html";
+    }, 5000);
+  </script>
+</body>
+</html>

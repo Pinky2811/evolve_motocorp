@@ -15,14 +15,16 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.PostConstruct;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 public class PaymentController {
 
-    private static final String RAZORPAY_KEY = "rzp_test_XXXXX"; // 🔑 Replace with your Key ID
-    private static final String RAZORPAY_SECRET = "YOUR_SECRET_KEY"; // 🔑 Replace with your Secret Key
+    // ✅ Use your LIVE Razorpay keys
+    private static final String RAZORPAY_KEY = "rzp_live_RbzgMYaL9gfRdw";
+    private static final String RAZORPAY_SECRET = "hfD0kpDwmpARhCkig4IkoKki"; // keep safe!
 
     private RazorpayClient razorpayClient;
 
@@ -32,13 +34,15 @@ public class PaymentController {
     @Autowired
     private NotificationService notificationService;
 
-    // ✅ Initialize Razorpay client once
+    // ✅ Initialize Razorpay Client
     @PostConstruct
     public void init() throws Exception {
         this.razorpayClient = new RazorpayClient(RAZORPAY_KEY, RAZORPAY_SECRET);
     }
 
-    // ✅ Step 1: Create Razorpay Order (returns JSON cleanly)
+    // ================================================================
+    // STEP 1️⃣: Create Razorpay Order
+    // ================================================================
     @PostMapping("/create_order")
     public ResponseEntity<?> createOrder(@RequestParam int amount) {
         try {
@@ -50,7 +54,6 @@ public class PaymentController {
 
             Order order = razorpayClient.orders.create(options);
 
-            // Convert Order JSON → Map
             Map<String, Object> response = new Gson().fromJson(order.toString(), Map.class);
             return ResponseEntity.ok(response);
 
@@ -61,7 +64,9 @@ public class PaymentController {
         }
     }
 
-    // ✅ Step 2–6: Verify + Save Booking + Notify
+    // ================================================================
+    // STEP 2️⃣–6️⃣: Verify Payment + Save Booking + Notify
+    // ================================================================
     @PostMapping("/confirm")
     public ResponseEntity<?> confirmBooking(
             @RequestParam String razorpay_order_id,
@@ -69,25 +74,32 @@ public class PaymentController {
             @RequestParam String razorpay_signature,
             @RequestParam String name,
             @RequestParam String address,
-            @RequestParam String mobile) {
+            @RequestParam String mobile,
+            @RequestParam(required = false) String receiptNo, // ⚙️ Optional but useful
+            @RequestParam(required = false) String couponNo // ⚙️ Optional but useful
+    ) {
         try {
-            // Step 2: Verify Payment Signature
+            // ✅ Step 2: Verify Razorpay Signature (in HEX)
             String payload = razorpay_order_id + "|" + razorpay_payment_id;
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secret_key = new SecretKeySpec(RAZORPAY_SECRET.getBytes(), "HmacSHA256");
-            sha256_HMAC.init(secret_key);
-            String generatedSignature = Base64.getEncoder().encodeToString(
-                    sha256_HMAC.doFinal(payload.getBytes()));
+            SecretKeySpec secretKey = new SecretKeySpec(RAZORPAY_SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            sha256_HMAC.init(secretKey);
+
+            byte[] hash = sha256_HMAC.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash)
+                sb.append(String.format("%02x", b));
+            String generatedSignature = sb.toString();
 
             if (!generatedSignature.equals(razorpay_signature)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "Payment verification failed"));
+                        .body(Map.of("error", "❌ Payment verification failed!"));
             }
 
-            // Step 3–5: Save booking + assign voucher
+            // ✅ Step 3: Confirm booking in DB (assign random or unused voucher internally)
             Prebooking booking = bookingService.confirmBooking(name, address, mobile);
 
-            // Step 6: Build confirmation message
+            // ✅ Step 4: Confirmation message
             String msg = "Hello " + booking.getName() + ",\n" +
                     "🎉 Your payment was successful!\n\n" +
                     "Receipt No: " + booking.getReceiptNo() + "\n" +
@@ -98,20 +110,26 @@ public class PaymentController {
                     "✅ Thank you for booking with EVOLVE MOTOCORP!\n" +
                     "🎁 Your gift will be delivered within 7 days.";
 
-            // Step 7: Send SMS & WhatsApp
-            notificationService.sendSms(mobile, msg);
-            notificationService.sendWhatsApp(mobile, msg);
+            // ✅ Step 5: Send notifications
+            try {
+                notificationService.sendSms(mobile, msg);
+                notificationService.sendWhatsApp(mobile, msg);
+            } catch (Exception ex) {
+                System.err.println("⚠ Notification failed: " + ex.getMessage());
+            }
 
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "message", "Booking confirmed, SMS & WhatsApp sent",
-                    "receiptNo", booking.getReceiptNo(),
-                    "couponNo", booking.getCouponNo()));
+            // ✅ Step 6: Send success response
+            Map<String, Object> successResponse = new HashMap<>();
+            successResponse.put("status", "success");
+            successResponse.put("message", "Payment verified & booking confirmed");
+            successResponse.put("receiptNo", booking.getReceiptNo());
+            successResponse.put("couponNo", booking.getCouponNo());
+            return ResponseEntity.ok(successResponse);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", "Server error: " + e.getMessage()));
         }
     }
 }

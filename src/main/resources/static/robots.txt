@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemap link for search engines
+Sitemap: https://evolvemotocorp.com/sitemap.xml
+
+# Prevent search engines from indexing system or private folders
+Disallow: /admin/
+Disallow: /assets/
+Disallow: /Offline/
+Disallow: /js/
+Disallow: /css/

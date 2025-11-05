@@ -13,7 +13,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/") // Map to root
-@CrossOrigin(origins = "*") // Allow frontend access
+// @CrossOrigin(origins = "*") // Allow frontend access
+@CrossOrigin(origins = {
+        "https://evolvemotocorp.com",
+        "https://www.evolvemotocorp.com",
+        "http://localhost:8080"
+})
+
 public class EVModelController {
 
     @Autowired
