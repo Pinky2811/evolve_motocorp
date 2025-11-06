@@ -16,7 +16,7 @@ import java.util.*;
 @CrossOrigin(origins = {
         "https://evolvemotocorp.com",
         "https://www.evolvemotocorp.com",
-        "https://evolve-motocorp-1.onrender.com", // optional
+        "https://evolve-motocorp-1.onrender.com/Evolve_Ev", // optional
         "http://localhost:8080"
 })
 @RestController
