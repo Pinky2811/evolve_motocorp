@@ -1,4 +1,3 @@
-// stopdt_template.js
 (function () {
   // --- Detect if DevTools is open ---
   function isDevToolsOpen() {
@@ -8,27 +7,22 @@
     return widthDiff || heightDiff;
   }
 
-  // --- Close or redirect tab if DevTools detected ---
+  // --- Redirect or close tab if DevTools detected ---
   function handleDevToolsDetected() {
-    // Try to close the current tab
-    window.open('', '_self');
+    // Try to close the tab
+    window.open("", "_self");
     window.close();
 
-    // If closing is blocked, redirect as fallback
+    // If blocked, redirect as fallback
     setTimeout(() => {
-window.location.href = "/Evolve_Ev/error.html";
+      window.location.href = "/Evolve_Ev/error.html";
     }, 200);
-
-    // Last fallback (if browser blocks both)
-    setTimeout(() => {
-window.location.href = "/Evolve_Ev/error.html";
-    }, 400);
   }
 
-  // --- Disable right-click and shortcuts ---
+  // --- Disable right-click and keyboard shortcuts ---
   function DisableDevtool() {
-    document.addEventListener("contextmenu", e => e.preventDefault());
-    document.addEventListener("keydown", e => {
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("keydown", (e) => {
       if (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key)) ||
@@ -38,26 +32,25 @@ window.location.href = "/Evolve_Ev/error.html";
       }
     });
 
-    // Start checking if DevTools is opened
+    // Continuously check if DevTools are open
     setInterval(() => {
-      if (isDevToolsOpen()) {
-        handleDevToolsDetected();
-      }
+      if (isDevToolsOpen()) handleDevToolsDetected();
     }, 1000);
   }
 
-  // --- Allow DevTools only if backend returns true ---
-  fetch("/Evolve_Ev/check_dev")
-    .then(res => res.text())
-    .then(txt => {
+  // --- Check from backend if DevTools are allowed ---
+  fetch(`${BASE_URL}/check_dev`, {
+    credentials: "include" // keep same session for /enable_dev
+  })
+    .then((res) => res.text())
+    .then((txt) => {
       if (txt.includes("true")) {
-        // console.log("✅ Dev mode active — inspect tools allowed.");
+        console.log("✅ Developer mode active — DevTools allowed.");
       } else {
         DisableDevtool();
       }
     })
     .catch(() => {
-      // if backend unreachable, disable as precaution
       DisableDevtool();
     });
 })();
